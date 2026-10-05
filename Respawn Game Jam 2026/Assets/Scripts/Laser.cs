@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Laser : MonoBehaviour
@@ -16,6 +17,10 @@ public class Laser : MonoBehaviour
     [SerializeField]
     private float rayOffset = 0.01f;
 
+    [SerializeField]
+    private Color laserColor = Color.red;
+    private List<LineRenderer> laserSegments = new List<LineRenderer>();
+
     void Start()
     {
         lr = GetComponent<LineRenderer>();
@@ -29,11 +34,9 @@ public class Laser : MonoBehaviour
 
     void CastLaser(Vector3 position, Vector3 direction)
     {
-        Vector3[] points = new Vector3[maxBounces + 1];
+        ClearLaserSegments();
 
-        points[0] = startPoint.position;
-
-        int pointCount = 1;
+        Color currentColor = laserColor;
 
         for(int i=0; i<maxBounces; i++)
         {
@@ -44,32 +47,98 @@ public class Laser : MonoBehaviour
             {
                 Debug.Log("Laser hit: " + hit.collider.gameObject.name);
 
-                points[pointCount] = hit.point;
-                pointCount++;
+                CreateLaserSegment(position, hit.point, currentColor);
 
-                if(!hit.collider.CompareTag("Mirror"))
+                if(hit.collider.CompareTag("Color"))
                 {
-                    break;
+                    ColorBoard colorBoard = hit.collider.GetComponent<ColorBoard>();
+                    if(colorBoard != null)
+                    {
+                        currentColor = colorBoard.laserColor;
+                    }
+
+                    position = hit.point + direction * rayOffset;
+
+                    continue;
                 }
 
-                direction = Vector3.Reflect(direction, hit.normal);
+                if(hit.collider.CompareTag("Mirror"))
+                {
+                    direction = Vector3.Reflect(direction, hit.normal);
 
-                position = hit.point + direction * rayOffset;
+                    position = hit.point + direction * rayOffset;
+
+                    continue;
+                }
+
+                return;
             }
             else
             {
-                points[pointCount] = position + direction * laserDistance;
-                pointCount++;
+                Vector3 endPoint = position + direction * laserDistance;
 
-                break;
+                CreateLaserSegment(position, endPoint, currentColor);
+
+                return;
+            }
+        }
+    }
+
+    void CreateLaserSegment(Vector3 start, Vector3 end, Color color)
+    {
+        GameObject segmentObject = new GameObject("Laser Segment");
+
+        segmentObject.transform.SetParent(transform);
+
+        LineRenderer segment = segmentObject.AddComponent<LineRenderer>();
+
+        LineRenderer original = GetComponent<LineRenderer>();
+
+        if(original != null)
+        {
+            segment.material = original.material;
+            segment.startWidth = original.startWidth;
+            segment.endWidth = original.endWidth;
+            segment.alignment = original.alignment;
+            segment.textureMode = original.textureMode;
+        }
+
+        segment.positionCount = 2;
+
+        segment.SetPosition(0, start);
+        segment.SetPosition(1, end);
+
+        Gradient gradient = new Gradient();
+
+        gradient.SetKeys(
+            new GradientColorKey[]
+            {
+                new GradientColorKey(color, 0f),
+                new GradientColorKey(color, 1f)
+            },
+            new GradientAlphaKey[]
+            {
+                new GradientAlphaKey(1f, 0f),
+                new GradientAlphaKey(1f, 1f)
+            }
+            );
+
+        segment.colorGradient = gradient;
+
+        laserSegments.Add(segment);
+
+    }
+
+    void ClearLaserSegments()
+    {
+        foreach(LineRenderer segment in laserSegments)
+        {
+            if(segment != null)
+            {
+                Destroy(segment.gameObject);
             }
         }
 
-        lr.positionCount = pointCount;
-
-        for(int i=0; i<pointCount; i++)
-        {
-            lr.SetPosition(i, points[i]);
-        }
+        laserSegments.Clear();
     }
 }
