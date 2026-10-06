@@ -7,6 +7,9 @@ TagManager:
   - Mirror
   - Color
   - Laser
+  - "\u673A\u5173"
+  - Door
+  - PressurePlate
   layers:
   - Default
   - TransparentFX

@@ -21,6 +21,23 @@ public class Laser : MonoBehaviour
     private Color laserColor = Color.red;
     private List<LineRenderer> laserSegments = new List<LineRenderer>();
 
+    [Header("Rotation Settings")]
+    [SerializeField]
+    private float rotationAmount = 90f;
+    [SerializeField]
+    private float rotationDuration = 1f;
+
+    [SerializeField]
+    private float cooldownTime = 2f;
+    private float cooldownTimer = 0f;
+
+    private bool isRotating = false;
+    private float rotationStart;
+    private float rotationTarget;
+    private float rotationTimer;
+
+    private PressurePlate currentPressurePlate;
+
     void Start()
     {
         lr = GetComponent<LineRenderer>();
@@ -30,11 +47,73 @@ public class Laser : MonoBehaviour
     void Update()
     {
         CastLaser(transform.position, -transform.right);
+
+        if (cooldownTimer > 0f)
+        {
+            cooldownTimer -= Time.deltaTime;
+        }
+
+        if(isRotating)
+        {
+            rotationTimer += Time.deltaTime;
+            float t = rotationTimer / rotationDuration;
+
+            t = Mathf.SmoothStep(0f, 1f, t);
+
+            float currentRotation = Mathf.LerpAngle(rotationStart, rotationTarget, t);
+
+            transform.rotation = Quaternion.Euler(transform.eulerAngles.x, currentRotation, transform.eulerAngles.z);
+
+            if (rotationTimer >= rotationDuration)
+            {
+                transform.rotation = Quaternion.Euler(transform.eulerAngles.x, rotationTarget, transform.eulerAngles.z);
+
+                isRotating = false;
+
+                cooldownTimer = cooldownTime;
+            }
+
+            return;
+        }
+
+        if (cooldownTimer <= 0f)
+        {
+            if(Input.GetKeyDown(KeyCode.E))
+            {
+                RotateRight();
+            }
+
+            if(Input.GetKeyDown(KeyCode.Q))
+            {
+                RotateLeft();
+            }
+        }
+    }
+
+    void RotateRight()
+    {
+        isRotating = true;
+        rotationTimer = 0f;
+
+        rotationStart = transform.eulerAngles.y;
+        rotationTarget = rotationStart + rotationAmount;
+    }
+
+    void RotateLeft()
+    {
+        isRotating = true;
+        rotationTimer = 0f;
+
+        rotationStart = transform.eulerAngles.y;
+        rotationTarget = rotationStart - rotationAmount;
     }
 
     void CastLaser(Vector3 position, Vector3 direction)
     {
         ClearLaserSegments();
+
+        PressurePlate previousPressurePlate = currentPressurePlate;
+        currentPressurePlate = null;
 
         Color currentColor = laserColor;
 
@@ -45,7 +124,6 @@ public class Laser : MonoBehaviour
 
             if(Physics.Raycast(ray, out RaycastHit hit, laserDistance))
             {
-                Debug.Log("Laser hit: " + hit.collider.gameObject.name);
 
                 CreateLaserSegment(position, hit.point, currentColor);
 
@@ -71,7 +149,20 @@ public class Laser : MonoBehaviour
                     continue;
                 }
 
-                return;
+                if(hit.collider.CompareTag("PressurePlate"))
+                {
+                    PressurePlate plate = hit.collider.GetComponent<PressurePlate>();
+
+                    if(plate != null)
+                    {
+                        currentPressurePlate = plate;
+                        plate.ReceiveLaser(currentColor);
+                    }
+
+                    break;
+                }
+
+                break;
             }
             else
             {
@@ -79,8 +170,13 @@ public class Laser : MonoBehaviour
 
                 CreateLaserSegment(position, endPoint, currentColor);
 
-                return;
+                break;
             }
+        }
+
+        if(previousPressurePlate != null && previousPressurePlate != currentPressurePlate)
+        {
+            previousPressurePlate.LaserStopped();
         }
     }
 
