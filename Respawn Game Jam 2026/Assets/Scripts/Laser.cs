@@ -38,6 +38,9 @@ public class Laser : MonoBehaviour
 
     private PressurePlate currentPressurePlate;
 
+    [SerializeField]
+    private Camera playerCamera;
+
     void Start()
     {
         lr = GetComponent<LineRenderer>();
@@ -53,7 +56,7 @@ public class Laser : MonoBehaviour
             cooldownTimer -= Time.deltaTime;
         }
 
-        if(isRotating)
+        if (isRotating)
         {
             rotationTimer += Time.deltaTime;
             float t = rotationTimer / rotationDuration;
@@ -76,18 +79,44 @@ public class Laser : MonoBehaviour
             return;
         }
 
-        if (cooldownTimer <= 0f)
+        if (!IsCursorOverThisLaser())
         {
-            if(Input.GetKeyDown(KeyCode.E))
-            {
-                RotateRight();
-            }
-
-            if(Input.GetKeyDown(KeyCode.Q))
-            {
-                RotateLeft();
-            }
+            return;
         }
+
+        if (cooldownTimer > 0f)
+        {
+            return;
+        }
+
+        if(Input.GetKeyDown(KeyCode.E))
+        {
+            RotateRight();
+        }
+
+        if(Input.GetKeyDown(KeyCode.Q))
+        {
+            RotateLeft();
+        }
+    }
+
+    bool IsCursorOverThisLaser()
+    {
+        Camera cam = playerCamera;
+
+        if(cam == null)
+        {
+            return false;
+        }
+
+        Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+
+        if(Physics.Raycast(ray, out RaycastHit hit, 1000f))
+        {
+            return hit.transform == transform;
+        }
+
+        return false;
     }
 
     void RotateRight()
