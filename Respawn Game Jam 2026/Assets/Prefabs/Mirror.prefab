@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 5755256474022242654}
   - component: {fileID: 6605585496928856438}
   - component: {fileID: 5492065395785050784}
+  - component: {fileID: 8868320938831005009}
   m_Layer: 0
   m_Name: Mirror
   m_TagString: Mirror
@@ -27,9 +28,9 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6871418703709044647}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.07956262, y: -0.16994396, z: 0.03186441, w: 0.98171973}
+  m_LocalRotation: {x: 0.07956092, y: -0.16994065, z: 0.03186663, w: 0.9817203}
   m_LocalPosition: {x: -3.78, y: 1.62, z: 3.87}
-  m_LocalScale: {x: 2.1998, y: 1.7366, z: 0.398}
+  m_LocalScale: {x: 2.1998003, y: 1.7365999, z: 0.398}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -65,7 +66,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: b906f54601a53d1499b62deb5de79a9d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -108,3 +109,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &8868320938831005009
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6871418703709044647}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64a5ff0924995c54b8598595e2eb6b87, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerCamera: {fileID: 0}
+  rotationAmount: 90
+  rotationDuration: 1
+  cooldownTime: 2

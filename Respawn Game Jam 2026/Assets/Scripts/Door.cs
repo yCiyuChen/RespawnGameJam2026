@@ -66,10 +66,6 @@ public class Door : MonoBehaviour
         {
             OpenDoor();
         }
-        else
-        {
-            CloseDoor();
-        }
     }
 
     public void OpenDoor()
@@ -77,8 +73,4 @@ public class Door : MonoBehaviour
         isOpen = true;
     }
 
-    public void CloseDoor()
-    {
-        isOpen = false;
-    }
 }
