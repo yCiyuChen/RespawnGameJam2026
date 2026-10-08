@@ -1,11 +1,13 @@
 using System.Collections.Generic;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class playerCam : MonoBehaviour
 {
-    public float sensX;
-    public float sensY;
+    public Slider slider;
+    public float mouseSens = 200f;
+    public Transform playerBody;
 
     public Transform orientation;
 
@@ -17,13 +19,17 @@ public class playerCam : MonoBehaviour
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        mouseSens = PlayerPrefs.GetFloat("currentSensitivity", 100);
+        slider.value = mouseSens/10;
     }
 
     // Update is called once per frame
     void Update()
     {
-        float mouseX = Input.GetAxisRaw("Mouse X") * Time.deltaTime * sensX;
-        float mouseY = Input.GetAxisRaw("Mouse Y") * Time.deltaTime * sensY;
+        PlayerPrefs.SetFloat("currentSensitivity", mouseSens);
+        float mouseX = Input.GetAxisRaw("Mouse X") * Time.deltaTime * mouseSens;
+        float mouseY = Input.GetAxisRaw("Mouse Y") * Time.deltaTime * mouseSens;
 
         yRotation += mouseX;
 
@@ -32,5 +38,10 @@ public class playerCam : MonoBehaviour
 
         transform.rotation = Quaternion.Euler(xRotation, yRotation, 0);
         orientation.rotation = Quaternion.Euler(0, yRotation, 0);
+    }
+
+    public void AdjustSpeed(float newSpeed)
+    {
+        mouseSens = newSpeed * 10;
     }
 }

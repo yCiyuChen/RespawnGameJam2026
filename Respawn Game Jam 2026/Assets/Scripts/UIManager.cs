@@ -1,9 +1,11 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class UIManager : MonoBehaviour
 {
     [SerializeField] private GameObject pauseMenu;
+    [SerializeField] private GameObject mainMenu;
 
     public bool isPaused;
 
@@ -11,6 +13,7 @@ public class UIManager : MonoBehaviour
     void Start()
     {
         pauseMenu.SetActive(false);
+        mainMenu.SetActive(false);
     }
 
     // Update is called once per frame
@@ -34,6 +37,9 @@ public class UIManager : MonoBehaviour
         pauseMenu.SetActive(true);
         Time.timeScale = 0;
         isPaused = true;
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 
     public void ResumeGame()
@@ -44,5 +50,10 @@ public class UIManager : MonoBehaviour
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+    }
+
+    public void MainMenu()
+    {
+        SceneManager.LoadScene("MainMenu");
     }
 }
