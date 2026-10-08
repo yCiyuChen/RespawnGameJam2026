@@ -12,6 +12,15 @@ public class PressurePlate : MonoBehaviour
 
     private bool isActivated = false;
 
+    private AudioSource audioSource;
+    private int audioCount = 0;
+
+    void Start()
+    {
+        audioSource = GetComponent<AudioSource>();
+        audioSource.volume = Mathf.Clamp01(0.7f);
+    }
+
     public void ReceiveLaser(Color laserColor)
     {
         if(ColorsMatch(laserColor, requiredColor))
@@ -31,9 +40,16 @@ public class PressurePlate : MonoBehaviour
             return;
         }
 
-        isActivated = true;
+        if(audioCount == 1)
+        {
+            audioSource.mute = true;
+        }
 
-        if(door != null)
+        isActivated = true;
+        audioSource.Play();
+        audioCount++;
+
+        if (door != null)
         {
             door.PlateActivated();
         }
