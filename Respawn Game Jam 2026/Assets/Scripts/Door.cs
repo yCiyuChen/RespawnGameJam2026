@@ -11,12 +11,15 @@ public class Door : MonoBehaviour
     private Vector3 closedPosition;
     private Vector3 openPosition;
 
-    private bool isOpen = false;
+    public bool isOpen = false;
 
     private int activatedPlates = 0;
 
     [SerializeField]
     private int requiredPlates = 1;
+
+    private AudioSource audioSource;
+    private int audioCount = 0;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -24,6 +27,8 @@ public class Door : MonoBehaviour
         closedPosition = transform.position;
 
         openPosition = closedPosition + Vector3.up * openHeight;
+
+        audioSource = GetComponent<AudioSource>();
         
     }
 
@@ -70,7 +75,13 @@ public class Door : MonoBehaviour
 
     public void OpenDoor()
     {
+        if(audioCount == 1)
+        {
+            audioSource.mute = true;
+        }
         isOpen = true;
+        audioSource.Play();
+        audioCount++;
     }
 
 }

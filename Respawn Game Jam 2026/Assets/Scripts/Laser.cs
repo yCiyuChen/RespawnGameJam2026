@@ -31,6 +31,9 @@ public class Laser : MonoBehaviour
     private float cooldownTime = 2f;
     private float cooldownTimer = 0f;
 
+    private int rotationStep = 0;
+    private float startingRotation;
+
     private bool isRotating = false;
     private float rotationStart;
     private float rotationTarget;
@@ -41,9 +44,15 @@ public class Laser : MonoBehaviour
     [SerializeField]
     private Camera playerCamera;
 
+    private AudioSource audioSource;
+
     void Start()
     {
         lr = GetComponent<LineRenderer>();
+
+        startingRotation = transform.localEulerAngles.y;
+
+        audioSource = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -59,20 +68,20 @@ public class Laser : MonoBehaviour
         if (isRotating)
         {
             rotationTimer += Time.deltaTime;
-            float t = rotationTimer / rotationDuration;
 
+            float t = rotationTimer / rotationDuration;
+            t = Mathf.Clamp01(t);
             t = Mathf.SmoothStep(0f, 1f, t);
 
-            float currentRotation = Mathf.LerpAngle(rotationStart, rotationTarget, t);
+            float currentRotation = Mathf.Lerp(rotationStart, rotationTarget, t);
 
-            transform.rotation = Quaternion.Euler(transform.eulerAngles.x, currentRotation, transform.eulerAngles.z);
+            transform.localRotation = Quaternion.Euler(transform.localEulerAngles.x, currentRotation, transform.localEulerAngles.z);
 
-            if (rotationTimer >= rotationDuration)
+            if (t >= 1f)
             {
-                transform.rotation = Quaternion.Euler(transform.eulerAngles.x, rotationTarget, transform.eulerAngles.z);
+                transform.localRotation = Quaternion.Euler(transform.localEulerAngles.x, rotationTarget, transform.localEulerAngles.z);
 
                 isRotating = false;
-
                 cooldownTimer = cooldownTime;
             }
 
@@ -91,13 +100,27 @@ public class Laser : MonoBehaviour
 
         if(Input.GetKeyDown(KeyCode.E))
         {
-            RotateRight();
+            audioSource.Play();
+            Rotate(1);
         }
 
         if(Input.GetKeyDown(KeyCode.Q))
         {
-            RotateLeft();
+            audioSource.Play();
+            Rotate(-1);
         }
+    }
+
+    void Rotate(int direction)
+    {
+        rotationStart = startingRotation + (rotationStep * rotationAmount);
+
+        rotationStep += direction;
+
+        rotationTarget = startingRotation + (rotationStep * rotationAmount);
+
+        rotationTimer = 0f;
+        isRotating = true;
     }
 
     bool IsCursorOverThisLaser()
@@ -117,24 +140,6 @@ public class Laser : MonoBehaviour
         }
 
         return false;
-    }
-
-    void RotateRight()
-    {
-        isRotating = true;
-        rotationTimer = 0f;
-
-        rotationStart = transform.eulerAngles.y;
-        rotationTarget = rotationStart + rotationAmount;
-    }
-
-    void RotateLeft()
-    {
-        isRotating = true;
-        rotationTimer = 0f;
-
-        rotationStart = transform.eulerAngles.y;
-        rotationTarget = rotationStart - rotationAmount;
     }
 
     void CastLaser(Vector3 position, Vector3 direction)

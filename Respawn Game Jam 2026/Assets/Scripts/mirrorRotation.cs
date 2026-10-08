@@ -23,6 +23,14 @@ public class mirrorRotation : MonoBehaviour
     private float rotationTarget;
     private float rotationTimer;
 
+    private AudioSource audioSource;
+
+    void Start()
+    {
+        audioSource = GetComponent<AudioSource>();
+        audioSource.volume = Mathf.Clamp01(0.5f);
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -67,11 +75,13 @@ public class mirrorRotation : MonoBehaviour
 
         if(Input.GetKeyDown(KeyCode.E))
         {
+            audioSource.Play();
             RotateRight();
         }
 
         if(Input.GetKeyDown(KeyCode.Q))
         {
+            audioSource.Play();
             RotateLeft();
         }
         
