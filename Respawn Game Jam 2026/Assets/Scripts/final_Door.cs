@@ -3,7 +3,7 @@ using UnityEngine;
 public class FinalDoor : MonoBehaviour
 {
     [SerializeField]
-    private float openHeight = 3f;
+    private float openHeight = 100f;
 
     [SerializeField]
     private float openSpeed = 3f;
