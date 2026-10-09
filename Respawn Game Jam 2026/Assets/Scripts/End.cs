@@ -4,11 +4,12 @@ using UnityEngine.UI;
 public class End : MonoBehaviour
 {
     [SerializeField] GameObject endScreen;
+    [SerializeField] AudioSource audioSource;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+        audioSource = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -26,6 +27,7 @@ public class End : MonoBehaviour
 
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
+            audioSource.Play();
         }
     }
 }
